@@ -1,0 +1,257 @@
+{% load staticfiles %}
+{% load blog_tags %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>首页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-default navbar-fixed-top" id="navbar" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#header-navbar" aria-expanded="false">
+                        <span class="sr-only"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                        <h1 class="logo">
+                            <a href="{% url 'blog_index' %}">&nbsp;PyGuo</a>
+                        </h1>
+                </div>
+
+               <div class="collapse navbar-collapse" id="header-navbar">
+
+                     <form class="navbar-form navbar-right" action="{% url 'blog:blog_search' %}" method="get">
+                        <div class="input-group">
+                            <input type="text" name="keyword" class="form-control key" placeholder="" maxlength="20" autocomplete="on">
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-default btn-search">搜索</button>
+                            </span>
+                        </div>
+                    </form>
+
+                    <ul class="nav navbar-nav navbar-left">
+
+                        <li><a href="{% url 'blog_index' %}">首页</a></li>
+						{% get_categories as category_list %}
+                        {% for category in category_list %}
+						<li><a href="{%  url 'blog:blog_category' category.id %}">{{category.name}}</a></li>
+					    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+
+        <div class="row">
+
+              <div class="col-md-9">
+                  <div class="content-wrap">
+            <div class="content">
+                <div class="introBanner">
+                    <p>Github: <a href="https://github.com/PyGuojun" class="github">https://github.com/PyGuojun</a></p>
+                </div>
+                {% for entry in entry_list.object_list %}
+                    <div class="excerpt">
+                                <header>
+                                    <a class="cat" href="{% url 'blog:blog_category' entry.category.id %}">{{ entry.category.name|slice:"2"}}<i></i></a>
+                                    <h2><a href="{{ entry.get_absolute_url }}">{{ entry.title }}</a></h2>
+                                </header>
+                                {% if entry.abstract %}
+                                    <p>{{ entry.abstract }}</p>
+                                {% else %}
+                                    <p class="id_body">{{ entry.body|truncatechars:200 }}
+                                        <a href="{% url 'blog:blog_detail' entry.id %}">展开</a>
+                                    </p>
+                                {% endif %}
+                                <p class="meta">
+                                    <a class="author"><i class="glyphicon glyphicon-user"></i> {{ entry.author }}</a>
+									<a class="category"><i class="glyphicon glyphicon-folder-open"></i>  {{ entry.tags.name }}</a>
+                                    <a class="time"><i class="glyphicon glyphicon-time"></i> {{ entry.created_time }}</a>
+                                    <a class="views"><i class="glyphicon glyphicon-eye-open"></i> {{ entry.visiting }}</a>
+                                    <a class="comment"><i class="glyphicon glyphicon-comment"></i> {{ entry.get_comment_count }}</a>									
+                                </p>
+                            </div>
+                {% endfor %}
+                <nav aria-label="Page navigation" class="text-center">
+                    <ul class="pagination">
+                                {% if entry_list.has_previous %}
+                                    <li>
+                                        <a href="?{{ entry_list.previous_page_number.querystring }}"
+                                           aria-label="Previous">
+                                            <span aria-hidden="true">上一页</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% for page in entry_list.pages %}
+                                    {% if page %}
+                                        {% ifequal page entry_list.number %}
+                                            <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
+                                        {% else %}
+                                            <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                                        {% endifequal %}
+                                    {% else %}
+                                        <li><a href="">...</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if entry_list.has_next %}
+                                    <li>
+                                        <a href="?{{ entry_list.next_page_number.querystring }}" aria-label="Next">
+                                            <span aria-hidden="true">下一页</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                </nav>
+            </div>
+        </div>
+              </div>
+
+             <div class="col-md-3">
+                 <div class="sidebar" id="date">
+            <div class="widget widget_hot ">
+                        <h3>最热文章</h3>
+                        {% get_popular_entries as popular_entry_list %}
+                        {% for entry in popular_entry_list %}
+                            <ul>
+                            <li>
+                                <a title="" href="{{ entry.get_absolute_url }}">
+                                    <span class="text">{{ entry.title }}</span>
+                                    <span class="muted"><i class="glyphicon glyphicon-time"></i>
+                                            {{ entry.created_time|date:"Y年m月d日" }}
+                                    </span>
+                                    <span class="muted">
+                                        <i class="glyphicon glyphicon-eye-open"></i> {{ entry.visiting }}
+                                    </span>
+                                </a>
+                            </li>
+                            </ul>
+                        {% endfor %}
+                    </div>
+            <div class="widget widget_category">
+                        <h3>文章分类</h3>
+                        <ul>
+                            <li>
+                                <a href="{% url 'blog_index' %}">
+                                    <span class="text"><i
+                                            class="glyphicon glyphicon-triangle-right"></i>全部</span>
+                                    <span class="count">{% get_entries %}篇</span>
+                                </a>
+                            </li>
+                            {% get_categories as category_list %}
+                            {% for category in category_list %}
+                            <li>
+                                <a href="{% url 'blog:blog_category' category.id %}">
+                                <span class="text"><i class="glyphicon glyphicon-triangle-right"></i>{{ category.name }}</span>
+                                <span class="count">{% get_entry_count_of_category category.name %}篇</span>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+
+                    </div>
+            <div class="widget">
+                        <h3>归档</h3>
+                         {% archives as date_list %}
+                        {% for date in date_list %}
+                        <ul>
+                            <li>
+                                <a href="{% url 'blog:blog_archives' date.year date.month%}">
+                                    <span class="text">
+                                        <i class="glyphicon glyphicon-flag"></i> {{ date.year }} 年 {{ date.month }} 月
+                                    </span>
+                                    <span class="count">{% get_entry_count_of_date date.year date.month %}篇</span>
+                                </a>
+                            </li>
+                        </ul>
+                        {% endfor %}
+                    </div>
+            <div class="widget widget_sentence">
+                        <h3>标签云</h3>
+                         {% get_tags as tag_list %}
+                         {% for tag in tag_list %}
+                        <ul>
+                            <li>
+                                <a href="{% url 'blog:blog_tag' tag.id %}" style="font-size: 20px;">
+                                    <span class="label {% cycle 'label-default' 'label-primary' 'label-success' 'label-info' 'label-warning' 'label-danger' %}">
+                                        {{ tag.name }} <span class="badge">{% get_entry_count_of_tag tag.name %}</span>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                        {% endfor %}
+                    </div>
+            <div class="widget RSS">
+                        <h3>RSS订阅</h3>
+                        <ul>
+                            <li>
+                                <a href="/latest/feed/"><i class="glyphicon glyphicon-plus"></i>&nbsp;订阅</a>
+                            </li>
+                        </ul>
+                    </div>
+        </div>
+             </div>
+        </div>
+
+
+    </div>
+
+	<div id="back-to-top">
+        <i class="glyphicon glyphicon-arrow-up"></i>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>Copyright &copy; 2019.PyGuo的博客.Inc All rights reserved</p>
+        </div>
+    </div>
+    
+
+    <script src="http://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script>
+    $("#back-to-top").click(function () {
+        window.scrollTo(0, 0);
+    });
+    </script>
+	<script type="text/javascript">
+        var documentHeight = 0;
+        var topPadding = 2;
+        $(function() {
+            var el = $(".sidebar");
+            var offset = el.offset();
+            documentHeight = $(document).height();
+            $(window).scroll(function() {
+                var sideBarHeight = el.height();
+                if ($(window).scrollTop() > offset.top) {
+                    var newPosition = ($(window).scrollTop() - offset.top) + topPadding;
+                    var maxPosition = documentHeight - (sideBarHeight);
+                    if (newPosition > maxPosition) {
+                        newPosition = maxPosition;
+                    }
+                    el.stop().animate({
+                        marginTop: newPosition
+                    });
+                } else {
+                    el.stop().animate({
+                        marginTop: 0
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

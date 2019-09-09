@@ -4,8 +4,7 @@ mysite_blog
 -------
 项目简介：
 -------
-mysite_blog是基于python3.6+Django 1.11.7+Bootstrap3开发的个人博客项目，支持博客的增删改查、搜索、分类展示、评论、以及富文本编辑等功能
-
+mysite_blog是基于python3.6+Django 1.11.7+Bootstrap3开发的个人博客项目，支持文章的富文本编辑、搜索、分类展示、评论、标签云、RSS订阅等功能
 
 使用方法：
 -------

@@ -1,11 +1,11 @@
 mysite_blog
 ====
+个人博客：http://pyguo.cn
+-------
 项目简介：
 -------
 mysite_blog是基于python3.6+Django 1.11.7+Bootstrap3开发的个人博客项目，支持博客的增删改查、搜索、分类展示、评论、以及富文本编辑等功能
 
-个人博客：http://pyguo.cn
--------
 
 使用方法：
 -------
